@@ -1,0 +1,782 @@
+--DBMS_PROJECT
+--CAMPUS_PAY
+
+CREATE TABLE users (
+    roll_no INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(15) UNIQUE NOT NULL,
+    card_uid VARCHAR(20) UNIQUE NOT NULL,
+    created_at DATETIME NOT NULL
+);
+
+-- Insert sample records
+INSERT INTO users (roll_no, name, email, phone, card_uid, created_at) VALUES
+(1, 'Aarav Mehta', 'aarav@thapar.edu', '9876543210', '04A1B2C3', '2023-07-20 00:00:00'),
+(2, 'Sara Nair', 'sara@thapar.edu', '9823456710', '04D3E2F1', '2023-07-21 00:00:00'),
+(3, 'Ravi Sharma', 'ravi@thapar.edu', '9812345671', '04FFEE11', '2023-07-21 00:00:00'),
+(4, 'Meena Rao', 'meena@thapar.edu', '9898989898', '0499AABB', '2023-07-21 00:00:00'),
+(5, 'Karan Joshi', 'karan@thapar.edu', '9723232323', '04CC DDEE', '2023-07-22 00:00:00'),
+(6, 'Sneha Das', 'sneha@thapar.edu', '9765432101', '04224466', '2023-07-22 00:00:00'),
+(7, 'Anil Kapoor', 'anil@thapar.edu', '9834343434', '0488AA11', '2023-07-22 00:00:00'),
+(8, 'Pooja Singh', 'pooja@thapar.edu', '9887766555', '04D611AA', '2023-07-23 00:00:00'),
+(9, 'Vikram Verma', 'vikram@thapar.edu', '9888777666', '0433BB DD', '2024-07-18 00:00:00'),
+(10, 'Divya Iyer', 'divya@thapar.edu', '9777888999', '0455CCEE', '2024-07-19 00:00:00');
+
+CREATE TABLE wallets (
+    wallet_id INT PRIMARY KEY,
+    roll_no INT NOT NULL,
+    balance DECIMAL(10,2) NOT NULL DEFAULT 0,
+    transaction_counter INT DEFAULT 0,
+    last_updated TIMESTAMP NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    FOREIGN KEY (roll_no) REFERENCES users(roll_no)
+);
+
+CREATE TABLE scanners (
+    device_id VARCHAR(50) PRIMARY KEY,
+    location VARCHAR(100) NOT NULL,
+    added_on DATETIME NOT NULL
+);
+
+INSERT INTO wallets (wallet_id, roll_no, balance, transaction_counter, last_updated, is_active) VALUES
+(101, 1, 892, 2, '2025-04-20T14:10:32', 1),
+(102, 2, 1395, 3, '2025-04-23T14:11:34', 1),
+(103, 3, 980, 2, '2025-04-21T12:38:40', 1),
+(104, 4, 929, 4, '2025-04-23T11:37:00', 1),
+(105, 5, 785, 2, '2025-04-21T16:05:26', 1),
+(106, 6, 810, 4, '2025-04-25T16:30:50', 1),
+(107, 7, 1040, 4, '2025-04-24T22:38:39', 1),
+(108, 8, 925, 2, '2025-04-22T19:55:01', 1),
+(109, 9, 905, 3, '2025-04-25T08:32:41', 1),
+(110, 10, 920, 3, '2025-04-25T17:19:39', 1);
+
+INSERT INTO scanners (device_id, location, added_on) VALUES
+('scanner_001', 'Kravings - Dominoes', '2025-04-20 00:00:00'),
+('scanner_002', 'Aahar', '2025-04-20 00:00:00'),
+('scanner_003', 'TSLAS Canteen', '2025-04-20 00:00:00'),
+('scanner_004', 'Library', '2025-04-20 00:00:00'),
+('scanner_005', 'Just Foodz', '2025-04-20 00:00:00'),
+('scanner_006', 'Bombay Munchery', '2025-04-20 00:00:00'),
+('scanner_007', 'Shadowz Saloon', '2025-04-20 00:00:00'),
+('scanner_008', 'Hostel C Mess', '2025-04-20 00:00:00'),
+('scanner_009', 'Waterfront Cafe', '2025-04-20 00:00:00'),
+('scanner_010', 'Jaggi', '2025-04-20 00:00:00'),
+('P2P_TRANSFER', 'Peer-to-Peer Transfer', '2025-04-20 00:00:00');
+
+
+CREATE TABLE transactions (
+    txn_id INT PRIMARY KEY,
+    roll_no INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    txn_time TIMESTAMP NOT NULL,
+    txn_counter INT NOT NULL,
+    device_id VARCHAR(50) NOT NULL,
+    FOREIGN KEY (roll_no) REFERENCES users(roll_no),
+    FOREIGN KEY (device_id) REFERENCES scanners(device_id)
+);
+
+
+INSERT INTO transactions (txn_id, roll_no, amount, txn_time, txn_counter, device_id) VALUES
+(201, 1, 108, '2025-04-20T14:10:32', 1, 'scanner_001'),
+(202, 2, 130, '2025-04-20T18:24:55', 1, 'scanner_002'),
+(203, 3, 20,  '2025-04-21T12:38:40', 1, 'scanner_003'),
+(204, 4, 13,  '2025-04-21T09:16:48', 1, 'scanner_004'),
+(205, 5, 215, '2025-04-21T16:05:26', 1, 'scanner_005'),
+(206, 6, 70,  '2025-04-22T15:59:17', 1, 'scanner_006'),
+(207, 7, 200, '2025-04-22T13:43:59', 1, 'scanner_007'),
+(208, 8, 75,  '2025-04-22T19:55:01', 1, 'scanner_008'),
+(209, 9, 30,  '2025-04-23T10:30:34', 1, 'scanner_009'),
+(210, 10, 35, '2025-04-23T17:23:12', 1, 'scanner_010'),
+(211, 4, 158, '2025-04-23T11:37:00', 2, 'scanner_001'),
+(212, 6, 105, '2025-04-24T20:46:51', 2, 'scanner_002'),
+(213, 7, 60,  '2025-04-24T15:37:28', 2, 'scanner_010'),
+(214, 10, 45, '2025-04-25T17:19:39', 2, 'scanner_010'),
+(215, 9, 65,  '2025-04-25T08:32:41', 2, 'scanner_009'),
+(216, 6, 15,  '2025-04-25T16:30:50', 3, 'scanner_009');
+
+CREATE TABLE topups (
+    topup_id INT PRIMARY KEY,
+    roll_no INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    ref_txn_id VARCHAR(50) UNIQUE NOT NULL,
+    topup_time TIMESTAMP NOT NULL,
+    FOREIGN KEY (roll_no) REFERENCES users(roll_no)
+);
+
+INSERT INTO topups (topup_id, roll_no, amount, payment_method, ref_txn_id, topup_time) VALUES
+(301, 1, 1000, 'INITIAL DEPOSIT', '301', '2025-04-20T00:00:00'),
+(302, 2, 1000, 'INITIAL DEPOSIT', '302', '2025-04-20T00:00:00'),
+(303, 3, 1000, 'INITIAL DEPOSIT', '303', '2025-04-20T00:00:00'),
+(304, 4, 1000, 'INITIAL DEPOSIT', '304', '2025-04-20T00:00:00'),
+(305, 5, 1000, 'INITIAL DEPOSIT', '305', '2025-04-20T00:00:00'),
+(306, 6, 1000, 'INITIAL DEPOSIT', '306', '2025-04-20T00:00:00'),
+(307, 7, 1000, 'INITIAL DEPOSIT', '307', '2025-04-20T00:00:00'),
+(308, 8, 1000, 'INITIAL DEPOSIT', '308', '2025-04-20T00:00:00'),
+(309, 9, 1000, 'INITIAL DEPOSIT', '309', '2025-04-20T00:00:00'),
+(310, 10, 1000, 'INITIAL DEPOSIT', '310', '2025-04-20T00:00:00'),
+(311, 4, 100, 'GPay', 'upi123abc', '2025-04-22T16:56:27'),
+(312, 2, 525, 'Debit Card', 'dc456def', '2025-04-23T14:11:34'),
+(313, 7, 300, 'Net Banking', 'neft789ghi', '2025-04-24T22:38:39');
+
+
+--SQL Queries
+-- Find the transactions between 4pm and 7pm everyday grouped by scanner
+SELECT 
+    t.device_id,
+    s.location,
+    COUNT(t.txn_id) AS total_transactions,
+    SUM(t.amount) AS total_amount
+FROM transactions t
+JOIN scanners s ON t.device_id = s.device_id
+WHERE EXTRACT(HOUR FROM t.txn_time) BETWEEN 16 AND 18
+GROUP BY t.device_id, s.location
+ORDER BY total_transactions DESC;
+
+
+-- Display the users with balance lower than ₹900
+SELECT 
+    u.roll_no,
+    u.name,
+    w.balance
+FROM users u
+JOIN wallets w ON u.roll_no = w.roll_no
+WHERE w.balance < 900
+ORDER BY w.balance ASC;
+
+
+--PL/SQL Functions and Procedures and their executions
+-- PL/SQL Function that will return the balance of the asked roll_no
+CREATE OR REPLACE FUNCTION get_balance(p_roll_no IN NUMBER)
+RETURN NUMBER
+IS
+    v_balance NUMBER;
+BEGIN
+    SELECT balance
+    INTO v_balance
+    FROM wallets
+    WHERE roll_no = p_roll_no;
+
+    RETURN v_balance;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN NULL;
+END;
+/
+
+
+-- Testing the PL/SQL function that returns the current balance of the given roll_no
+SELECT get_balance(1) FROM dual;
+
+
+-- PL/SQL Procedure to update wallet active status
+CREATE OR REPLACE PROCEDURE update_wallet_active_status(
+    p_roll_no   IN NUMBER,
+    p_is_active IN NUMBER
+)
+IS
+    v_wallet_id NUMBER;
+BEGIN
+    -- Validate input
+    IF p_is_active NOT IN (0, 1) THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: is_active must be 0 or 1. Skipping update.');
+        RETURN;
+    END IF;
+
+    -- Check if wallet exists
+    BEGIN
+        SELECT wallet_id
+        INTO v_wallet_id
+        FROM wallets
+        WHERE roll_no = p_roll_no;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for roll number ' || p_roll_no || '. Skipping update.');
+            RETURN;
+    END;
+
+    -- Update the is_active flag
+    UPDATE wallets
+    SET is_active   = p_is_active,
+        last_updated = SYSTIMESTAMP
+    WHERE roll_no = p_roll_no;
+
+    -- Commit the transaction
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('Wallet active status updated for roll number ' || p_roll_no ||
+                         ' (is_active: ' || p_is_active || ').');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error updating wallet active status for roll number ' || p_roll_no || ': ' || SQLERRM);
+END;
+/
+
+-- Testing the update_wallet_active_status procedure
+BEGIN
+    -- Test Update (Activate Wallet)
+    DBMS_OUTPUT.PUT_LINE('Testing activation of wallet for roll number 1...');
+    update_wallet_active_status(
+        p_roll_no   => 1,
+        p_is_active => 0
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Update (Deactivate Wallet)
+    DBMS_OUTPUT.PUT_LINE('Testing deactivation of wallet for roll number 1...');
+    update_wallet_active_status(
+        p_roll_no   => 1,
+        p_is_active => 1
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Update (Invalid Value)
+    DBMS_OUTPUT.PUT_LINE('Testing update with invalid value...');
+    update_wallet_active_status(
+        p_roll_no   => 1,
+        p_is_active => 2
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Update (Non-existent Roll Number)
+    DBMS_OUTPUT.PUT_LINE('Testing update with invalid roll number...');
+    update_wallet_active_status(
+        p_roll_no   => 999,
+        p_is_active => 0
+    );
+END;
+/
+
+
+-- PL/SQL Procedure to process wallet balance topups
+CREATE OR REPLACE PROCEDURE process_topup(
+    p_roll_no IN NUMBER,
+    p_amount IN NUMBER,
+    p_payment_method IN VARCHAR2,
+    p_ref_txn_id IN VARCHAR2
+)
+IS
+    v_wallet_id NUMBER;
+    v_current_balance NUMBER;
+    v_next_topup_id NUMBER;
+    v_updated_balance NUMBER;
+BEGIN
+    -- Validate inputs
+    IF p_amount <= 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Top-up amount must be positive. Skipping top-up.');
+        RETURN;
+    END IF;
+    IF p_ref_txn_id IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Reference transaction ID cannot be null. Skipping top-up.');
+        RETURN;
+    END IF;
+
+    -- Check if wallet is active
+    DECLARE
+        v_is_active NUMBER;
+    BEGIN
+        SELECT is_active
+        INTO v_is_active
+        FROM wallets
+        WHERE roll_no = p_roll_no;
+        IF v_is_active = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: Wallet for roll number ' || p_roll_no || ' is inactive. Skipping top-up.');
+            RETURN;
+        END IF;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for roll number ' || p_roll_no || '. Skipping top-up.');
+            RETURN;
+    END;
+
+    -- Get wallet details
+    BEGIN
+        SELECT wallet_id, balance
+        INTO v_wallet_id, v_current_balance
+        FROM wallets
+        WHERE roll_no = p_roll_no;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for roll number ' || p_roll_no || '. Skipping top-up.');
+            RETURN;
+    END;
+
+    -- Determine next topup_id
+    SELECT NVL(MAX(topup_id), 0) + 1
+    INTO v_next_topup_id
+    FROM topups;
+
+    -- Insert top-up record
+    INSERT INTO topups (topup_id, roll_no, amount, payment_method, ref_txn_id, topup_time)
+    VALUES (v_next_topup_id, p_roll_no, p_amount, p_payment_method, p_ref_txn_id, SYSTIMESTAMP);
+
+    -- Update wallet balance
+    UPDATE wallets
+    SET balance = v_current_balance + p_amount,
+        transaction_counter = transaction_counter + 1,
+        last_updated = SYSTIMESTAMP
+    WHERE wallet_id = v_wallet_id;
+
+    -- Commit the transaction
+    COMMIT;
+
+    -- Fetch the updated balance
+    SELECT balance
+    INTO v_updated_balance
+    FROM wallets
+    WHERE roll_no = p_roll_no;
+
+    -- Output the success message with updated balance
+    DBMS_OUTPUT.PUT_LINE('Top-up successful for roll number ' || p_roll_no ||
+                         ' (new balance: ' || v_updated_balance || ').');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error during top-up for roll number ' || p_roll_no || ': ' || SQLERRM);
+END;
+
+-- Testing the process_topup procedure
+BEGIN
+    -- Test Top-Up (Successful Case)
+    DBMS_OUTPUT.PUT_LINE('Testing top-up for roll number 1...');
+    process_topup(
+        p_roll_no => 1,
+        p_amount => 500.00,
+        p_payment_method => 'Credit Card',
+        p_ref_txn_id => 'cc789abc'
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Top-Up (Invalid Amount)
+    DBMS_OUTPUT.PUT_LINE('Testing top-up with invalid amount...');
+    process_topup(
+        p_roll_no => 1,
+        p_amount => -100.00,
+        p_payment_method => 'Credit Card',
+        p_ref_txn_id => 'cc123abc'
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Top-Up (Inactive Wallet)
+    DBMS_OUTPUT.PUT_LINE('Testing top-up with inactive wallet...');
+    update_wallet_active_status(
+        p_roll_no => 1,
+        p_is_active => 0
+    );
+    process_topup(
+        p_roll_no => 1,
+        p_amount => 200.00,
+        p_payment_method => 'Credit Card',
+        p_ref_txn_id => 'cc456def'
+    );
+    update_wallet_active_status(
+        p_roll_no => 1,
+        p_is_active => 1
+    );
+END;
+
+
+-- PL/SQL Procedure to process transactions
+CREATE OR REPLACE PROCEDURE process_transaction(
+    p_roll_no IN NUMBER,
+    p_amount IN NUMBER,
+    p_device_id IN VARCHAR2
+)
+IS
+    v_wallet_id NUMBER;
+    v_current_balance NUMBER;
+    v_next_txn_id NUMBER;
+    v_updated_balance NUMBER;
+BEGIN
+    -- Validate inputs
+    IF p_amount <= 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Transaction amount must be positive. Skipping transaction.');
+        RETURN;
+    END IF;
+    IF p_device_id IS NULL THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Device ID cannot be null. Skipping transaction.');
+        RETURN;
+    END IF;
+
+    -- Check if wallet is active
+    DECLARE
+        v_is_active NUMBER;
+    BEGIN
+        SELECT is_active
+        INTO v_is_active
+        FROM wallets
+        WHERE roll_no = p_roll_no;
+        IF v_is_active = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: Wallet for roll number ' || p_roll_no || ' is inactive. Skipping transaction.');
+            RETURN;
+        END IF;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for roll number ' || p_roll_no || '. Skipping transaction.');
+            RETURN;
+    END;
+
+    -- Get wallet details
+    BEGIN
+        SELECT wallet_id, balance
+        INTO v_wallet_id, v_current_balance
+        FROM wallets
+        WHERE roll_no = p_roll_no;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for roll number ' || p_roll_no || '. Skipping transaction.');
+            RETURN;
+    END;
+
+    -- Check sufficient balance
+    IF v_current_balance < p_amount THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Insufficient balance for roll number ' || p_roll_no || '. Skipping transaction.');
+        RETURN;
+    END IF;
+
+    -- Determine next txn_id
+    SELECT NVL(MAX(txn_id), 0) + 1
+    INTO v_next_txn_id
+    FROM transactions;
+
+    -- Insert transaction record
+    INSERT INTO transactions (txn_id, roll_no, amount, txn_time, txn_counter, device_id)
+    VALUES (v_next_txn_id, p_roll_no, p_amount, SYSTIMESTAMP,
+            (SELECT NVL(MAX(txn_counter), 0) + 1 FROM transactions WHERE roll_no = p_roll_no),
+            p_device_id);
+
+    -- Update wallet balance
+    UPDATE wallets
+    SET balance = v_current_balance - p_amount,
+        transaction_counter = transaction_counter + 1,
+        last_updated = SYSTIMESTAMP
+    WHERE wallet_id = v_wallet_id;
+
+    -- Commit the transaction
+    COMMIT;
+
+    -- Fetch the updated balance
+    SELECT balance
+    INTO v_updated_balance
+    FROM wallets
+    WHERE roll_no = p_roll_no;
+
+    -- Output the success message with updated balance
+    DBMS_OUTPUT.PUT_LINE('Transaction successful for roll number ' || p_roll_no ||
+                         ' (new balance: ' || v_updated_balance || ').');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error during transaction for roll number ' || p_roll_no || ': ' || SQLERRM);
+END;
+
+
+-- Testing the process_transaction procedure
+BEGIN
+    -- Test Transaction (Successful Case)
+    DBMS_OUTPUT.PUT_LINE('Testing transaction for roll number 1...');
+    process_transaction(
+        p_roll_no => 1,
+        p_amount => 200.00,
+        p_device_id => 'scanner_001'
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Transaction (Insufficient Balance)
+    DBMS_OUTPUT.PUT_LINE('Testing transaction with insufficient balance...');
+    process_transaction(
+        p_roll_no => 1,
+        p_amount => 5000.00, -- More than current balance
+        p_device_id => 'scanner_001'
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Transaction (Non-existent Roll Number)
+    DBMS_OUTPUT.PUT_LINE('Testing transaction with invalid roll number...');
+    process_transaction(
+        p_roll_no => 999, -- Non-existent roll_no
+        p_amount => 100.00,
+        p_device_id => 'scanner_001'
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test Transaction (Inactive Wallet)
+    DBMS_OUTPUT.PUT_LINE('Testing transaction with inactive wallet...');
+    update_wallet_active_status(
+        p_roll_no => 1,
+        p_is_active => 0
+    );
+    process_transaction(
+        p_roll_no => 1,
+        p_amount => 100.00,
+        p_device_id => 'scanner_001'
+    );
+    update_wallet_active_status(
+        p_roll_no => 1,
+        p_is_active => 1
+    );
+END;
+
+
+-- PL/SQL procedure to handle Peer-to-Peer (P2P) payments
+CREATE OR REPLACE PROCEDURE process_p2p_payment(
+    p_sender_roll_no IN NUMBER,
+    p_receiver_roll_no IN NUMBER,
+    p_amount IN NUMBER
+)
+IS
+    v_sender_wallet_id NUMBER;
+    v_sender_balance NUMBER;
+    v_receiver_wallet_id NUMBER;
+    v_receiver_balance NUMBER;
+    v_next_txn_id NUMBER;
+    v_updated_sender_balance NUMBER;
+    v_updated_receiver_balance NUMBER;
+BEGIN
+    -- Validate inputs
+    IF p_amount <= 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Payment amount must be positive. Skipping P2P payment.');
+        RETURN;
+    END IF;
+    IF p_sender_roll_no = p_receiver_roll_no THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Sender and receiver cannot be the same. Skipping P2P payment.');
+        RETURN;
+    END IF;
+
+    -- Check if sender wallet is active
+    DECLARE
+        v_is_active NUMBER;
+    BEGIN
+        SELECT is_active
+        INTO v_is_active
+        FROM wallets
+        WHERE roll_no = p_sender_roll_no;
+        IF v_is_active = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: Wallet for sender roll number ' || p_sender_roll_no || ' is inactive. Skipping P2P payment.');
+            RETURN;
+        END IF;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for sender roll number ' || p_sender_roll_no || '. Skipping P2P payment.');
+            RETURN;
+    END;
+
+    -- Check if receiver wallet is active
+    DECLARE
+        v_is_active NUMBER;
+    BEGIN
+        SELECT is_active
+        INTO v_is_active
+        FROM wallets
+        WHERE roll_no = p_receiver_roll_no;
+        IF v_is_active = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: Wallet for receiver roll number ' || p_receiver_roll_no || ' is inactive. Skipping P2P payment.');
+            RETURN;
+        END IF;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for receiver roll number ' || p_receiver_roll_no || '. Skipping P2P payment.');
+            RETURN;
+    END;
+
+    -- Get sender wallet details
+    BEGIN
+        SELECT wallet_id, balance
+        INTO v_sender_wallet_id, v_sender_balance
+        FROM wallets
+        WHERE roll_no = p_sender_roll_no;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for sender roll number ' || p_sender_roll_no || '. Skipping P2P payment.');
+            RETURN;
+    END;
+
+    -- Get receiver wallet details
+    BEGIN
+        SELECT wallet_id, balance
+        INTO v_receiver_wallet_id, v_receiver_balance
+        FROM wallets
+        WHERE roll_no = p_receiver_roll_no;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Warning: No wallet found for receiver roll number ' || p_receiver_roll_no || '. Skipping P2P payment.');
+            RETURN;
+    END;
+
+    -- Check sufficient balance
+    IF v_sender_balance < p_amount THEN
+        DBMS_OUTPUT.PUT_LINE('Warning: Insufficient balance for sender roll number ' || p_sender_roll_no || '. Skipping P2P payment.');
+        RETURN;
+    END IF;
+
+    -- Determine next transaction ID for sender
+    SELECT NVL(MAX(txn_id), 0) + 1
+    INTO v_next_txn_id
+    FROM transactions;
+
+    -- Record transaction for sender (deduction)
+    INSERT INTO transactions (txn_id, roll_no, amount, txn_time, txn_counter, device_id)
+    VALUES (v_next_txn_id, p_sender_roll_no, p_amount, SYSTIMESTAMP,
+            (SELECT NVL(MAX(txn_counter), 0) + 1 FROM transactions WHERE roll_no = p_sender_roll_no),
+            'P2P_TRANSFER');
+
+    -- Update sender wallet
+    UPDATE wallets
+    SET balance = balance - p_amount,
+        transaction_counter = transaction_counter + 1,
+        last_updated = SYSTIMESTAMP
+    WHERE wallet_id = v_sender_wallet_id;
+
+    -- Determine next transaction ID for receiver
+    SELECT NVL(MAX(txn_id), 0) + 1
+    INTO v_next_txn_id
+    FROM transactions;
+
+    -- Record transaction for receiver (addition)
+    INSERT INTO transactions (txn_id, roll_no, amount, txn_time, txn_counter, device_id)
+    VALUES (v_next_txn_id, p_receiver_roll_no, p_amount, SYSTIMESTAMP,
+            (SELECT NVL(MAX(txn_counter), 0) + 1 FROM transactions WHERE roll_no = p_receiver_roll_no),
+            'P2P_TRANSFER');
+
+    -- Update receiver wallet
+    UPDATE wallets
+    SET balance = balance + p_amount,
+        transaction_counter = transaction_counter + 1,
+        last_updated = SYSTIMESTAMP
+    WHERE wallet_id = v_receiver_wallet_id;
+
+    -- Commit the transaction
+    COMMIT;
+
+    -- Fetch the updated balances for sender and receiver
+    SELECT balance
+    INTO v_updated_sender_balance
+    FROM wallets
+    WHERE roll_no = p_sender_roll_no;
+
+    SELECT balance
+    INTO v_updated_receiver_balance
+    FROM wallets
+    WHERE roll_no = p_receiver_roll_no;
+
+    -- Output the success message with updated balances
+    DBMS_OUTPUT.PUT_LINE('P2P payment successful: ' || p_amount || ' transferred from roll number ' || p_sender_roll_no ||
+                         ' (new balance: ' || v_updated_sender_balance || ') to roll number ' || p_receiver_roll_no ||
+                         ' (new balance: ' || v_updated_receiver_balance || ').');
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error during P2P payment from roll number ' || p_sender_roll_no || ' to ' ||
+                             p_receiver_roll_no || ': ' || SQLERRM);
+END;
+
+
+-- Testing the process_p2p_payment procedure
+BEGIN
+    -- Test P2P Payment (Successful Case)
+    DBMS_OUTPUT.PUT_LINE('Testing P2P payment from roll number 1 to 2...');
+    DBMS_OUTPUT.PUT_LINE('');
+    process_p2p_payment(
+        p_sender_roll_no => 1,
+        p_receiver_roll_no => 2,
+        p_amount => 300.00
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test P2P Payment (Insufficient Balance)
+    DBMS_OUTPUT.PUT_LINE('Testing P2P payment with insufficient balance...');
+    process_p2p_payment(
+        p_sender_roll_no => 1,
+        p_receiver_roll_no => 2,
+        p_amount => 2000.00 -- More than current balance of 892.00
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test P2P Payment (Same Sender and Receiver)
+    DBMS_OUTPUT.PUT_LINE('Testing P2P payment with same sender and receiver...');
+    process_p2p_payment(
+        p_sender_roll_no => 1,
+        p_receiver_roll_no => 1,
+        p_amount => 100.00
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test P2P Payment (Non-existent Receiver)
+    DBMS_OUTPUT.PUT_LINE('Testing P2P payment with invalid receiver...');
+    process_p2p_payment(
+        p_sender_roll_no => 1,
+        p_receiver_roll_no => 999, -- Non-existent roll_no
+        p_amount => 100.00
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test P2P Payment (Inactive Sender Wallet)
+    DBMS_OUTPUT.PUT_LINE('Testing P2P payment with inactive sender wallet...');
+    update_wallet_active_status(
+        p_roll_no => 1,
+        p_is_active => 0
+    );
+    process_p2p_payment(
+        p_sender_roll_no => 1,
+        p_receiver_roll_no => 2,
+        p_amount => 100.00
+    );
+    update_wallet_active_status(
+        p_roll_no => 1,
+        p_is_active => 1
+    );
+
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE('');
+
+    -- Test P2P Payment (Inactive Receiver Wallet)
+    DBMS_OUTPUT.PUT_LINE('Testing P2P payment with inactive receiver wallet...');
+    update_wallet_active_status(
+        p_roll_no => 2,
+        p_is_active => 0
+    );
+    process_p2p_payment(
+        p_sender_roll_no => 1,
+        p_receiver_roll_no => 2,
+        p_amount => 100.00
+    );
+    update_wallet_active_status(
+        p_roll_no => 2,
+        p_is_active => 1
+    );
+END;
+
+
+
+
+
